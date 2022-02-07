@@ -1,5 +1,8 @@
+import com.google.gson.Gson
+import entity.ElrondResponse
+import entity.ElrondResponses
+import entity.database.Tables
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.apache.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -11,14 +14,17 @@ import java.io.*
 import java.net.*
 
 fun main() {
+    var json : Array<ElrondResponse>
     runBlocking {
         val client = HttpClient(Apache) {
             followRedirects = true
         }
-        client.getAsTempFile("http://127.0.0.1:8080/") { file ->
-            println(file.readBytes().size)
-        }
+        val content = client.get("https://api.elrond.com/tokens?identifier=RIDE-7d18e9").bodyAsText()
+        content
+        json = Gson().fromJson(content, Array<ElrondResponse>::class.java)
+        json
     }
+
 }
 
 data class HttpClientException(val response: HttpResponse) : IOException("HTTP Error ${response.status}")
